@@ -136,6 +136,36 @@ searchengine/fast:
 	$(MAKE) -f CMakeFiles/searchengine.dir/build.make CMakeFiles/searchengine.dir/build
 .PHONY : searchengine/fast
 
+aesencrypt.o: aesencrypt.c.o
+
+.PHONY : aesencrypt.o
+
+# target to build an object file
+aesencrypt.c.o:
+	$(MAKE) -f CMakeFiles/indexengine.dir/build.make CMakeFiles/indexengine.dir/aesencrypt.c.o
+	$(MAKE) -f CMakeFiles/searchengine.dir/build.make CMakeFiles/searchengine.dir/aesencrypt.c.o
+.PHONY : aesencrypt.c.o
+
+aesencrypt.i: aesencrypt.c.i
+
+.PHONY : aesencrypt.i
+
+# target to preprocess a source file
+aesencrypt.c.i:
+	$(MAKE) -f CMakeFiles/indexengine.dir/build.make CMakeFiles/indexengine.dir/aesencrypt.c.i
+	$(MAKE) -f CMakeFiles/searchengine.dir/build.make CMakeFiles/searchengine.dir/aesencrypt.c.i
+.PHONY : aesencrypt.c.i
+
+aesencrypt.s: aesencrypt.c.s
+
+.PHONY : aesencrypt.s
+
+# target to generate assembly for a file
+aesencrypt.c.s:
+	$(MAKE) -f CMakeFiles/indexengine.dir/build.make CMakeFiles/indexengine.dir/aesencrypt.c.s
+	$(MAKE) -f CMakeFiles/searchengine.dir/build.make CMakeFiles/searchengine.dir/aesencrypt.c.s
+.PHONY : aesencrypt.c.s
+
 encrypt.o: encrypt.c.o
 
 .PHONY : encrypt.o
@@ -440,6 +470,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... indexengine"
 	@echo "... searchengine"
+	@echo "... aesencrypt.o"
+	@echo "... aesencrypt.i"
+	@echo "... aesencrypt.s"
 	@echo "... encrypt.o"
 	@echo "... encrypt.i"
 	@echo "... encrypt.s"

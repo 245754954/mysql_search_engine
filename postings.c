@@ -2,6 +2,7 @@
 
 #include "util.h"
 #include "mysqldatabase.h"
+#include "aesencrypt.h"
 /**
  * 从字节序列中还原出倒排列表
  * @param[in] postings_e 待还原的倒排列表（字节序列）
@@ -420,12 +421,17 @@ int fetch_postings(const wiser_env *env, const int token_id,
   char *postings_e;
   int postings_e_size, docs_count, rc;
 
-  rc = db_get_postings1(env, token_id, &docs_count, (void **)&postings_e,&postings_e_size);
+  rc = db_get_postings1(env, token_id, &docs_count, (void **)&postings_e, &postings_e_size);
 
   if (!rc && postings_e_size)
   {
     /* 只有当倒排列表非空时，才进行解码 */
     int decoded_len;
+    
+    // char* decrypt_buf = (char *)malloc(postings_e_size);
+    // decrpyt_buf(postings_e,&decrypt_buf,postings_e_size);
+
+
     if (decode_postings(env, postings_e, postings_e_size, postings, &decoded_len))
     {
       print_error("postings list decode error");
@@ -521,8 +527,20 @@ void update_postings(const wiser_env *env, inverted_index_value *p)
     if ((buf = alloc_buffer()))
     {
       encode_postings(env, p->postings_list, p->docs_count, buf);
-      db_update_postings1(env, p->token_id, p->docs_count,
-                          BUFFER_PTR(buf), BUFFER_SIZE(buf));
+      // char *after_padding_buf = NULL;
+      // char *encrypt_buf = NULL;
+      // char *decrypt_buf = NULL;
+      // int padding_size = 0;
+      // after_padding_buf = padding_buf(BUFFER_PTR(buf), BUFFER_SIZE(buf), &padding_size);
+
+      // encrypt_buf = (char *)malloc(padding_size);
+    // encrpyt_buf(after_padding_buf, &encrypt_buf, padding_size);
+
+
+      db_update_postings1(env, p->token_id, p->docs_count, BUFFER_PTR(buf), BUFFER_SIZE(buf));
+     // db_update_postings1(env, p->token_id, p->docs_count, encrpyt_buf, padding_size);
+
+    //  free(encrypt_buf);
       free_buffer(buf);
     }
   }

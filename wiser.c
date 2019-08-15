@@ -6,10 +6,10 @@
 #include "token.h"
 #include "search.h"
 #include "postings.h"
-#include "database.h"
 #include "wikiload.h"
 #include "mysqldatabase.h"
 #include "searchengine.h"
+
 
 /**
  * 将文档添加到数据库中，建立倒排索引
@@ -30,18 +30,23 @@ void add_document(wiser_env *env, const char *title, const char *body, const cha
     title_size = strlen(title);
     body_size = strlen(body);
     timestamp_size = strlen(timestamp);
-    /* 将文档存储到数据库中并获取该文档对应的文档编号 */
+    /* 将文档存储到数据库中S并获取该文档对应的文档编号 */
+    char path[255]={'\0'};
+    sprintf(path,"/home/hadoop/wiser/%s",title);
+  /*
+    FILE *fp=NULL;
+    printf("the file path is %s\n",path);
+    if ((fp = fopen(path, "w+"))== NULL)
+    {
+      printf("file cannot open \n");
+      fprintf(stderr, "打开文件错误: %s\n", strerror( errno ));
+    }
+    fwrite(body , 1 , body_size , fp );
 
+    fclose(fp);
+    fp=NULL;
+*/
 
-
-
-
-
-
-
-
-
-    
     db_add_document1(env, title, title_size, body, body_size, timestamp, timestamp_size);
     document_id = db_get_document_id1(env, title, title_size);
 
@@ -87,7 +92,7 @@ void add_document(wiser_env *env, const char *title, const char *body, const cha
  * @return 错误代码
  * @retval 0 成功
  */
-int init_env(wiser_env *env,int ii_buffer_update_threshold, int enable_phrase_search,const char *db_path)
+int init_env(wiser_env *env, int ii_buffer_update_threshold, int enable_phrase_search, int enable_or_query,const char *db_path)
 {
   int rc;
   memset(env, 0, sizeof(wiser_env));
@@ -97,6 +102,7 @@ int init_env(wiser_env *env,int ii_buffer_update_threshold, int enable_phrase_se
     env->token_len = N_GRAM;
     env->ii_buffer_update_threshold = ii_buffer_update_threshold;
     env->enable_phrase_search = enable_phrase_search;
+    env->enable_or_query = enable_or_query;
   }
   return rc;
 }
@@ -119,7 +125,7 @@ void fin_env(wiser_env *env)
  * @param[in] method 压缩倒排列表的方法
  * @param[in] method_size 压缩方法名称的字节数
  */
-void parse_compress_method(wiser_env *env, const char *method,int method_size)
+void parse_compress_method(wiser_env *env, const char *method, int method_size)
 {
   if (method && method_size < 0)
   {
@@ -153,4 +159,3 @@ void parse_compress_method(wiser_env *env, const char *method,int method_size)
     break;
   }
 }
-
