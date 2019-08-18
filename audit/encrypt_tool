@@ -1,0 +1,30 @@
+语法
+openssl enc -ciphername[-in filename] [-out filename] [-pass arg] [-e] [-d] [-a/-base64] [-A] [-k password] [-kfile filename] [-K key] [-iv IV] [-S salt] [-salt] [-nosalt] [-z] [-md] [-p] [-P] [-bufsize number] [-nopad] [-debug] [-none] [-engine id]
+
+openssl des3 -pass pass:"123" -in a.txt -out a.txt.des3
+
+但是不推荐使用，理由是这种调用形式对于需要硬件引擎的算法不能正常工作（算法，可以由硬件完成）。
+-in / -out   filename    输入待加解密的文件，输出加解密后的文件
+-pass arg
+-pass 提供了几种传入密码的方式。传统是利用-k 选项传入密码的。（关于环境变量，文件描述符，请参阅相关文献）
+
+-pass pass:"123"      #密码是123
+-pass pass:123        #密码是123
+-pass evn:VAR         #密码从环境变量VAR中去
+-pass file:p.txt      #密码从文件p.txt第一行去，不包括换行符，注意DOS格式的^M及回车符。
+-pass fd:3            #密码从文件描述符3中读
+-pass stdin           #标准输入
+
+
+
+-e / -d         encrypt / decrypt 加解密。默认是加密，-d明确指定是解密。
+openssl enc -d -des3 -pass pass:123  -in a.des3salt -out a.decrypt
+aes-[128|192|256]-cbc  128/192/256 bit AES in CBC mode
+ aes-[128|192|256]      Alias for aes-[128|192|256]-cbc
+ aes-[128|192|256]-cfb  128/192/256 bit AES in 128 bit CFB mode
+ aes-[128|192|256]-cfb1 128/192/256 bit AES in 1 bit CFB mode
+ aes-[128|192|256]-cfb8 128/192/256 bit AES in 8 bit CFB mode
+ aes-[128|192|256]-ecb  128/192/256 bit AES in ECB mode
+ aes-[128|192|256]-ofb  128/192/256 bit AES in OFB mode
+
+

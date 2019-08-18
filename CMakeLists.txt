@@ -4,10 +4,12 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 add_compile_options(-std=c++11)
 SET(CMAKE_CXX_COMPILER "/usr/bin/gcc-8") 
 
-SET(INDEX_ENGINE  indexengine.c wiser.c mysqldatabase.c  encrypt.c util.c token.c search.c postings.c  wikiload.c)
+SET(INDEX_ENGINE  indexengine.c  wiser.c mysqldatabase.c  encrypt.c util.c token.c search.c postings.c  wikiload.c)
 
-SET(SEARCH_ENGINE  searchengine.c wiser.c mysqldatabase.c  encrypt.c util.c token.c search.c postings.c  wikiload.c)
+SET(SEARCH_ENGINE  searchengine.c  wiser.c mysqldatabase.c  encrypt.c util.c token.c search.c postings.c  wikiload.c)
 
+
+SET(ENCRYPT_TOOl aesencrypt.c)
 
 #判断编译器类型,如果是gcc编译器,则在编译选项中加入c++11支持
 
@@ -31,5 +33,11 @@ TARGET_LINK_LIBRARIES(indexengine PRIVATE  m cjson expat sqlite3 crypto mysqlcli
 
 
 add_executable(searchengine  ${SEARCH_ENGINE})
-target_link_libraries (searchengine PRIVATE sqlite3 m cjson mysqlclient expat event crypto )
+target_link_libraries (searchengine PRIVATE sqlite3 m cjson mysqlclient expat event crypto  )
 
+
+
+
+
+add_executable(encrypttool  ${ENCRYPT_TOOl})
+target_link_libraries (encrypttool PRIVATE crypto  )

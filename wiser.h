@@ -99,6 +99,9 @@ typedef struct _wiser_env
   MYSQL_STMT *get_count1;
 
   MYSQL_STMT *add_doc_count1;
+
+
+  MYSQL_STMT *token_partial_match_st1;
   // MYSQL_STMT *begin_st1;
   MYSQL_STMT *commit_st1;
   MYSQL_STMT *rollback_st1;

@@ -2,7 +2,6 @@
 #define __POSTINGS_H__
 
 #include "wiser.h"
-
 int fetch_postings(const wiser_env *env, const int token_id,
                    postings_list **postings, int *postings_len);
 void merge_inverted_index(inverted_index_hash *base,

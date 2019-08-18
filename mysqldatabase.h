@@ -46,4 +46,7 @@ int db_get_count1(const wiser_env *env);
 
 int add_doc_count1(const wiser_env *env,int val);
 
+
+int token_partial_match(const wiser_env *env,const char *query,int query_len,UT_array *token_ids);
+
 #endif

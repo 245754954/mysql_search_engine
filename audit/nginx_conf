@@ -1,0 +1,167 @@
+#运行用户
+user www-data;
+
+#启动进程,通常设置成和cpu的数量相等
+worker_processes auto;
+
+#全局错误日志
+#error_log  D:/Tools/nginx-1.10.1/logs/error.log;
+#error_log  D:/Tools/nginx-1.10.1/logs/notice.log  notice;
+#error_log  D:/Tools/nginx-1.10.1/logs/info.log  info;
+
+#PID文件，记录当前启动的nginx的进程ID
+pid /run/nginx.pid;
+
+
+#工作模式及连接数上限
+events {
+	#单个后台worker process进程的最大并发链接数
+	worker_connections 1024;
+	# multi_accept on;
+}
+
+#设定http服务器，利用它的反向代理功能提供负载均衡支持
+http {
+
+	##
+	# Basic Settings
+	##
+
+	#设定实际的服务器列表 
+    	upstream zp_server1
+	{
+        server 127.0.0.1:8080 weight=1;
+		server 127.0.0.1:8081 weight=1;
+		server 127.0.0.1:8082 weight=1;
+		server 127.0.0.1:8083 weight=1;
+        server 127.0.0.1:8084 weight=1;
+        server 127.0.0.1:8085 weight=1;
+        server 127.0.0.1:8086 weight=1;
+        server 127.0.0.1:8087 weight=1;
+        server 127.0.0.1:8088 weight=1;
+        server 127.0.0.1:8089 weight=1;
+        server 127.0.0.1:8090 weight=1;
+        server 127.0.0.1:8091 weight=1;
+        server 127.0.0.1:8092 weight=1;
+        server 127.0.0.1:8093 weight=1;
+        server 127.0.0.1:8094 weight=1;
+        server 127.0.0.1:8095 weight=1;
+        server 127.0.0.1:8096 weight=1;
+        server 127.0.0.1:8097 weight=1;
+        server 127.0.0.1:8098 weight=1;
+        server 127.0.0.1:8099 weight=1;
+        server 127.0.0.1:8100 weight=1;
+        server 127.0.0.1:8101 weight=1;
+        server 127.0.0.1:8102 weight=1;
+        server 127.0.0.1:8103 weight=1;
+        server 127.0.0.1:8104 weight=1;
+        server 127.0.0.1:8105 weight=1;
+        server 127.0.0.1:8106 weight=1;
+        server 127.0.0.1:8107 weight=1;
+        server 127.0.0.1:8108 weight=1;
+        server 127.0.0.1:8109 weight=1;
+        server 127.0.0.1:8110 weight=1;
+        server 127.0.0.1:8111 weight=1;
+        server 127.0.0.1:8112 weight=1;
+        server 127.0.0.1:8113 weight=1;
+        server 127.0.0.1:8114 weight=1;
+        server 127.0.0.1:8115 weight=1;
+        server 127.0.0.1:8116 weight=1;
+        server 127.0.0.1:8117 weight=1;
+        server 127.0.0.1:8118 weight=1;
+        server 127.0.0.1:8119 weight=1;
+        server 127.0.0.1:8120 weight=1;
+
+
+		ip_hash;
+   	}
+
+	server {
+	       #listen       443 ssl;
+		listen		80;	
+	       server_name  localhost;
+
+	       ssl_certificate      nginx.crt;
+	       ssl_certificate_key  nginx.key;
+
+	       location / {
+			#以下是一些反向代理的配置可删除.
+                	proxy_redirect off;
+		   	proxy_pass http://zp_server1;
+	       }
+	}
+	#sendfile 指令指定 nginx 是否调用 sendfile 函数（zero copy 方式）来输出文件，对于普通应用，
+        #必须设为 on,如果用来进行下载等应用磁盘IO重负载应用，可设置为 off，以平衡磁盘与网络I/O处理速度，降低系统的uptime.
+	sendfile on;
+	tcp_nopush on;
+	tcp_nodelay on;
+	 #连接超时时间
+	keepalive_timeout 65;
+
+
+	types_hash_max_size 2048;
+	# server_tokens off;
+
+	# server_names_hash_bucket_size 64;
+	# server_name_in_redirect off;
+
+	include /etc/nginx/mime.types;
+	default_type application/octet-stream;
+
+	##
+	# SSL Settings
+	##
+
+	ssl_protocols TLSv1 TLSv1.1 TLSv1.2; # Dropping SSLv3, ref: POODLE
+	ssl_prefer_server_ciphers on;
+
+	##
+	# Logging Settings
+	##
+
+	access_log /var/log/nginx/access.log;
+	error_log /var/log/nginx/error.log;
+
+	##
+	# Gzip Settings
+	##
+
+	gzip on;
+	gzip_disable "msie6";
+
+	# gzip_vary on;
+	# gzip_proxied any;
+	# gzip_comp_level 6;
+	# gzip_buffers 16 8k;
+	# gzip_http_version 1.1;
+	# gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+
+	##
+	# Virtual Host Configs
+	##
+
+	include /etc/nginx/conf.d/*.conf;
+	include /etc/nginx/sites-enabled/*;
+}
+
+
+#mail {
+#	# See sample authentication script at:
+#	# http://wiki.nginx.org/ImapAuthenticateWithApachePhpScript
+# 
+#	# auth_http localhost/auth.php;
+#	# pop3_capabilities "TOP" "USER";
+#	# imap_capabilities "IMAP4rev1" "UIDPLUS";
+# 
+#	server {
+#		listen     localhost:110;
+#		protocol   pop3;
+#		proxy      on;
+#	}
+# 
+#	server {
+#		listen     localhost:143;
+#		protocol   imap;
+#		proxy      on;
+#	}
+#}

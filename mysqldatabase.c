@@ -174,6 +174,9 @@ int init_database1(wiser_env *env, const char *db)
 
     env->get_count1 = mysql_stmt_init(env->conn);
     env->add_doc_count1 = mysql_stmt_init(env->conn);
+
+    env->token_partial_match_st1 = mysql_stmt_init(env->conn);
+
     char *get_document_id_st_str = "SELECT id FROM documents WHERE title = ?;";
     char *get_document_title_st_str = "SELECT title FROM documents WHERE id = ?;";
     char *insert_document_st_str = "INSERT INTO documents (title, body,tstamp) VALUES (?, ?,?)";
@@ -196,6 +199,8 @@ int init_database1(wiser_env *env, const char *db)
     char *get_count_st_str = "select count(*) from doccount;";
 
     char *add_doc_count_str = "INSERT INTO doccount(doc) VALUES(?);";
+
+    char *token_partial_match_str = "SELECT token FROM tokens WHERE token like ?|| '%';";
 
     if (mysql_stmt_prepare(env->get_document_id_st1,
                            get_document_id_st_str,
@@ -360,6 +365,14 @@ int init_database1(wiser_env *env, const char *db)
         return -1;
     }
 
+    if (mysql_stmt_prepare(env->token_partial_match_st1,
+                           token_partial_match_str,
+                           strlen(token_partial_match_str)))
+    {
+        fprintf(stderr, "line %d preapre error %s \n", __LINE__, mysql_error(env->conn));
+        exit(1);
+    }
+
     mysql_library_end();
     return EXIT_SUCCESS;
 }
@@ -383,7 +396,7 @@ void fin_database1(wiser_env *env)
     mysql_stmt_close(env->get_document_body_size_st1);
     mysql_stmt_close(env->get_document_visit_time_st1);
     mysql_stmt_close(env->get_count1);
-
+    mysql_stmt_close(env->token_partial_match_st1);
     mysql_stmt_close(env->add_doc_count1);
     //mysql_stmt_close(env->begin_st1);
     mysql_close(env->conn);
@@ -1210,25 +1223,85 @@ int db_get_count1(const wiser_env *env)
 int add_doc_count1(const wiser_env *env, int val)
 {
     MYSQL_BIND param[1];
-    memset(param,0,sizeof(param));
+    memset(param, 0, sizeof(param));
     param[0].buffer_type = MYSQL_TYPE_LONG;
-    param[0].buffer = (char*)&val;
+    param[0].buffer = (char *)&val;
 
-    if(mysql_stmt_reset(env->add_doc_count1)){
-        printf("reset error %s\n",mysql_stmt_error(env->add_doc_count1));
+    if (mysql_stmt_reset(env->add_doc_count1))
+    {
+        printf("reset error %s\n", mysql_stmt_error(env->add_doc_count1));
         exit(1);
     }
 
-    if(mysql_stmt_bind_param(env->add_doc_count1,param)){
-        printf("bind param error %s\n",mysql_stmt_error(env->add_doc_count1));
+    if (mysql_stmt_bind_param(env->add_doc_count1, param))
+    {
+        printf("bind param error %s\n", mysql_stmt_error(env->add_doc_count1));
         exit(1);
     }
 
-    if(mysql_stmt_execute(env->add_doc_count1)){
-        printf("execute error %s\n",mysql_stmt_error(env->add_doc_count1));
+    if (mysql_stmt_execute(env->add_doc_count1))
+    {
+        printf("execute error %s\n", mysql_stmt_error(env->add_doc_count1));
         exit(1);
     }
     mysql_stmt_free_result(env->add_doc_count1);
+
+    return 0;
+}
+
+int token_partial_match(const wiser_env *env, const char *query, int query_len, UT_array *token_ids)
+{
+
+    if (mysql_stmt_reset(env->token_partial_match_st1))
+    {
+        printf("reset error %d error %s\n", __LINE__, mysql_stmt_error(env->token_partial_match_st1));
+        exit(1);
+    }
+
+    MYSQL_BIND param[1];
+    memset(param, 0, sizeof(param));
+    param[0].buffer_type = MYSQL_TYPE_VAR_STRING;
+    param[0].buffer = (char*)query;
+    param[0].buffer_length = query_len;
+
+    if (mysql_stmt_bind_param(env->token_partial_match_st1, param))
+    {
+        printf("line %d error %s\n", __LINE__, mysql_stmt_error(env->token_partial_match_st1));
+        exit(1);
+    }
+
+    if (mysql_stmt_execute(env->token_partial_match_st1))
+    {
+        printf("line %d error %s\n", __LINE__, mysql_stmt_error(env->token_partial_match_st1));
+        exit(1);
+    }
+
+    char token[BUFFER_SIZE_DOC_CONTENT];
+   unsigned long length;
+    MYSQL_BIND bind[1];
+    memset(bind, 0, sizeof(bind));
+    bind[0].buffer_type = MYSQL_TYPE_VAR_STRING;
+    bind[0].buffer = token;
+    bind[0].buffer_length = BUFFER_SIZE_DOC_CONTENT;
+    bind[0].length = &length;
+    bind[0].is_null=0;
+
+    if (mysql_stmt_bind_result(env->token_partial_match_st1, bind))
+    {
+        printf("line  %d error %s\n", __LINE__, mysql_stmt_error(env->token_partial_match_st1));
+        exit(1);
+    }
+
+    if (mysql_stmt_fetch(env->token_partial_match_st1))
+    {
+      //  printf("line  %d error %s \n", __LINE__, mysql_stmt_error(env->token_partial_match_st1));
+        mysql_stmt_free_result(env->token_partial_match_st1);
+    }
+    else
+    {
+        utarray_push_back(token_ids, &token);
+        mysql_stmt_free_result(env->token_partial_match_st1);
+    }
 
     return 0;
 }

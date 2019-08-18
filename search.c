@@ -448,7 +448,22 @@ void search(wiser_env *env, const char *query)
 
     if (query32_len < env->token_len)
     {
-      print_error("too short query.");
+      // print_error("too short query.");
+
+      char **p;
+      UT_array *partial_tokens;
+
+      utarray_new(partial_tokens,&ut_str_icd);
+      token_partial_match(env,query,strlen(query),partial_tokens);
+      
+      for(p=(char**)utarray_front(partial_tokens);p;p=(char**)utarray_next(partial_tokens,p)){
+        inverted_index_hash *query_postings=NULL;
+        token_to_postings_list(env,0,*p,strlen(*p),0,&query_postings);
+
+        search_docs(env,&results,query_postings);
+      }
+
+      utarray_free(partial_tokens);
     }
     else
     {
