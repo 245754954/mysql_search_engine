@@ -20,7 +20,9 @@ Installation Prerequisites
     (1) Install project dependency Libraries (ubuntu16)
         apt-get install build-essential libmysqlclient-dev libexpat1-dev bzip2  openssl libssl-dev
     (2)compile
-        cmake .
+        mkdir build
+        cd ./build
+        cmake ..
         make
     (3) run
         ./indexengine [options] [database or none]
@@ -47,6 +49,27 @@ Installation Prerequisites
             template : ./indexengine -q [query condition] [database name]
             instance : ./indexengine -q "huawei" invertindex
             instance : ./indexengine -q "huawei" -a invertindex1  //-a means this query is or query
+
+
+audit:
+In order to test the concurrent quantity of HTTP modulethe test script is written in the audit directory.
+
+First you need to configure the nginx reverse proxy module,The reverse proxy configuration file for nginx is in "nginx_conf",after installing the nginx server,you can use config file as "nginx_conf",The configuration file is in the audit directory.if you operating system is ubuntu16.04,You can follow the following commands:
+
+apt-get install nginx
+
+vi /etc/nginx/nginx.conf
+
+Replace the original nginx configuration file with "nginx_conf" file in audit directory
+
+restart nginx by using the command :nginx -s reload
+
+start the searchengine server by using the script "start_server.sh",after execute the "start_server.sh" script,fourty daemons will be started in the background
+
+using the http-load tool to test the searchengine server,for example ,you can use the command as follows:
+    http-load -p 40 -s 10 as you can see -p means parallel ,-s means second
+
+
 
 
 
