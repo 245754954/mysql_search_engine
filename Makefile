@@ -155,7 +155,12 @@ aesencrypt.o: aesencrypt.c.o
 
 # target to build an object file
 aesencrypt.c.o:
+<<<<<<< HEAD
 	$(MAKE) -f CMakeFiles/encrypttool.dir/build.make CMakeFiles/encrypttool.dir/aesencrypt.c.o
+=======
+	$(MAKE) -f CMakeFiles/indexengine.dir/build.make CMakeFiles/indexengine.dir/aesencrypt.c.o
+	$(MAKE) -f CMakeFiles/searchengine.dir/build.make CMakeFiles/searchengine.dir/aesencrypt.c.o
+>>>>>>> f691f59579dfe6cfdf33d9581f143bc64360f27e
 .PHONY : aesencrypt.c.o
 
 aesencrypt.i: aesencrypt.c.i
@@ -164,7 +169,12 @@ aesencrypt.i: aesencrypt.c.i
 
 # target to preprocess a source file
 aesencrypt.c.i:
+<<<<<<< HEAD
 	$(MAKE) -f CMakeFiles/encrypttool.dir/build.make CMakeFiles/encrypttool.dir/aesencrypt.c.i
+=======
+	$(MAKE) -f CMakeFiles/indexengine.dir/build.make CMakeFiles/indexengine.dir/aesencrypt.c.i
+	$(MAKE) -f CMakeFiles/searchengine.dir/build.make CMakeFiles/searchengine.dir/aesencrypt.c.i
+>>>>>>> f691f59579dfe6cfdf33d9581f143bc64360f27e
 .PHONY : aesencrypt.c.i
 
 aesencrypt.s: aesencrypt.c.s
@@ -173,7 +183,12 @@ aesencrypt.s: aesencrypt.c.s
 
 # target to generate assembly for a file
 aesencrypt.c.s:
+<<<<<<< HEAD
 	$(MAKE) -f CMakeFiles/encrypttool.dir/build.make CMakeFiles/encrypttool.dir/aesencrypt.c.s
+=======
+	$(MAKE) -f CMakeFiles/indexengine.dir/build.make CMakeFiles/indexengine.dir/aesencrypt.c.s
+	$(MAKE) -f CMakeFiles/searchengine.dir/build.make CMakeFiles/searchengine.dir/aesencrypt.c.s
+>>>>>>> f691f59579dfe6cfdf33d9581f143bc64360f27e
 .PHONY : aesencrypt.c.s
 
 encrypt.o: encrypt.c.o

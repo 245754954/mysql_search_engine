@@ -272,8 +272,7 @@ int text_to_postings_lists(wiser_env *env,
 
       utf32toutf8(t, t_len, t_8, &t_8_size);
 
-      retval = token_to_postings_list(env, document_id, t_8, t_8_size,
-                                      position, &buffer_postings);
+      retval = token_to_postings_list(env, document_id, t_8, t_8_size,position, &buffer_postings);
       if (retval)
       {
         return retval;

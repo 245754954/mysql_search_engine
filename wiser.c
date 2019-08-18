@@ -6,12 +6,10 @@
 #include "token.h"
 #include "search.h"
 #include "postings.h"
-#include "database.h"
 #include "wikiload.h"
 #include "mysqldatabase.h"
 #include "searchengine.h"
 
-extern int errno ;
 /**
  * 将文档添加到数据库中，建立倒排索引
  * @param[in] env 存储着应用程序运行环境的结构体
@@ -31,7 +29,7 @@ void add_document(wiser_env *env, const char *title, const char *body, const cha
     title_size = strlen(title);
     body_size = strlen(body);
     timestamp_size = strlen(timestamp);
-    /* 将文档存储到数据库中并获取该文档对应的文档编号 */
+    /* 将文档存储到数据库中S并获取该文档对应的文档编号 */
     char path[255]={'\0'};
     sprintf(path,"/home/hadoop/wiser/%s",title);
   /*
@@ -93,7 +91,7 @@ void add_document(wiser_env *env, const char *title, const char *body, const cha
  * @return 错误代码
  * @retval 0 成功
  */
-int init_env(wiser_env *env, int ii_buffer_update_threshold, int enable_phrase_search, const char *db_path)
+int init_env(wiser_env *env, int ii_buffer_update_threshold, int enable_phrase_search, int enable_or_query,const char *db_path)
 {
   int rc;
   memset(env, 0, sizeof(wiser_env));
@@ -103,6 +101,7 @@ int init_env(wiser_env *env, int ii_buffer_update_threshold, int enable_phrase_s
     env->token_len = N_GRAM;
     env->ii_buffer_update_threshold = ii_buffer_update_threshold;
     env->enable_phrase_search = enable_phrase_search;
+    env->enable_or_query = enable_or_query;
   }
   return rc;
 }

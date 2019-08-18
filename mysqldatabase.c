@@ -1249,7 +1249,7 @@ int add_doc_count1(const wiser_env *env, int val)
     return 0;
 }
 
-int token_partial_match(const wiser_env *env, const char *query, int query_len, UT_array *token_ids)
+int token_partial_match1(const wiser_env *env, const char *query, int query_len, UT_array *token_ids)
 {
 
     if (mysql_stmt_reset(env->token_partial_match_st1))

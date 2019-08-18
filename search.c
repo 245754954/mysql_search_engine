@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <sys/types.h>
 
 #include "util.h"
 #include "token.h"
@@ -61,7 +62,7 @@ static int search_results_score_time(search_results *a, search_results *b)
 
   double x = difftime(t1, t2);
 
-  return (x>0)?1:(x<0)?-1:0;
+  return (x > 0) ? 1 : (x < 0) ? -1 : 0;
 }
 
 /**
@@ -115,7 +116,7 @@ add_search_result(wiser_env *env, search_results **results, const int document_i
       r->document_id = document_id;
       r->score = 0;
       db_get_document_size1(env, document_id, &r->body_size);
-      db_get_document_visit_time(env,document_id,&r->stamp);
+      db_get_document_visit_time(env, document_id, &r->stamp);
       HASH_ADD_INT(*results, document_id, r);
     }
   }
@@ -224,20 +225,16 @@ search_phrase(const query_token_hash *query_tokens,
  * @return 得分
  */
 static double
-calc_tf_idf(
-    const query_token_hash *query_tokens,
-    doc_search_cursor *doc_cursors, const int n_query_tokens,
-    const int indexed_count)
+calc_tf_idf(const query_token_hash *query_tokens, doc_search_cursor *doc_cursors, const int n_query_tokens, const int indexed_count)
 {
   int i;
   const query_token_value *qt;
   doc_search_cursor *dcur;
   double score = 0;
-  for (qt = query_tokens, dcur = doc_cursors, i = 0;
-       i < n_query_tokens;
-       qt = qt->hh.next, dcur++, i++)
+  for (qt = query_tokens, dcur = doc_cursors, i = 0; i < n_query_tokens; qt = qt->hh.next, dcur++, i++)
   {
     double idf = log2((double)indexed_count / qt->docs_count);
+    // printf("the value %d\n",dcur->current->document_id);
     score += (double)dcur->current->positions_count * idf;
   }
   return score;
@@ -258,8 +255,7 @@ void free_token_positions_list(token_positions_list *list)
  * @param[in,out] results 检索结果
  * @param[in] tokens 从查询中提取出的词元信息
  */
-void search_docs(wiser_env *env, search_results **results,
-                 query_token_hash *tokens)
+void search_docs_and(wiser_env *env, search_results **results, query_token_hash *tokens)
 {
   int n_tokens;
   doc_search_cursor *cursors;
@@ -274,9 +270,7 @@ void search_docs(wiser_env *env, search_results **results,
 
   /* 初始化 */
   n_tokens = HASH_COUNT(tokens);
-  if (n_tokens &&
-      (cursors = (doc_search_cursor *)calloc(
-           sizeof(doc_search_cursor), n_tokens)))
+  if (n_tokens && (cursors = (doc_search_cursor *)calloc(sizeof(doc_search_cursor), n_tokens)))
   {
     int i;
     doc_search_cursor *cur;
@@ -299,8 +293,11 @@ void search_docs(wiser_env *env, search_results **results,
         /* 虽然当前的token存在，但是由于更新或删除导致其倒排列表为空 */
         goto exit;
       }
+
       cursors[i].current = cursors[i].documents;
     }
+    // printf("the value of postions %d\n", cursors[0].current->positions_count);
+
     while (cursors[0].current)
     {
       int doc_id, next_doc_id = 0;
@@ -313,6 +310,7 @@ void search_docs(wiser_env *env, search_results **results,
         {
           cur->current = cur->current->next;
         }
+        //go to the ending of the list
         if (!cur->current)
         {
           goto exit;
@@ -342,10 +340,12 @@ void search_docs(wiser_env *env, search_results **results,
         }
         if (phrase_count)
         {
+
           double score = calc_tf_idf(tokens, cursors, n_tokens,
                                      env->indexed_count);
           add_search_result(env, results, doc_id, score);
         }
+
         cursors[0].current = cursors[0].current->next;
       }
     }
@@ -359,8 +359,131 @@ void search_docs(wiser_env *env, search_results **results,
     }
     free(cursors);
   }
+
   free_inverted_index(tokens);
 
+  if (SORT == "tf-idf")
+  {
+    HASH_SORT(*results, search_results_score_desc_sort);
+  }
+  else if (SORT == "size")
+  {
+    HASH_SORT(*results, search_results_body_size_desc_size);
+  }
+  else if (SORT == "time-sort")
+  {
+    HASH_SORT(*results, search_results_score_time);
+  }
+}
+
+/**
+ * 检索文档
+ * @param[in] env 存储着应用程序运行环境的结构体
+ * @param[in,out] results 检索结果
+ * @param[in] tokens 从查询中提取出的词元信息
+ */
+
+static int intsort(const void *_a, const void *_b)
+{
+  const int *a = (const int *)_a;
+  const int *b = (const int *)_b;
+
+  if (*a > *b)
+    return 1;
+  else if (*a == *b)
+    return 0;
+  else
+    return -1;
+}
+
+void search_docs_or(wiser_env *env, search_results **results, query_token_hash *tokens)
+{
+  int n_tokens;
+  doc_search_cursor *cursors;
+
+  if (!tokens)
+  {
+    return;
+  }
+
+  /* 按照文档频率的升序对tokens排序 */
+  HASH_SORT(tokens, query_token_value_docs_count_desc_sort);
+
+  /* 初始化 */
+
+  n_tokens = HASH_COUNT(tokens);
+  if (n_tokens && (cursors = (doc_search_cursor *)calloc(sizeof(doc_search_cursor), n_tokens)))
+  {
+    int i;
+    doc_search_cursor *cur;
+    doc_search_cursor *head;
+    query_token_value *token;
+    for (i = 0, token = tokens; token; i++, token = token->hh.next)
+    {
+      if (!token->token_id)
+      {
+        /* 当前的token在构建索引的过程中从未出现过 */
+        goto exit;
+      }
+      if (fetch_postings(env, token->token_id, &cursors[i].documents, NULL))
+      {
+        print_error("decode postings error!: %d\n", token->token_id);
+        goto exit;
+      }
+
+      if (!cursors[i].documents)
+      {
+        /* 虽然当前的token存在，但是由于更新或删除导致其倒排列表为空 */
+        goto exit;
+      }
+
+      cursors[i].current = cursors[i].documents;
+    }
+
+    UT_array *arr;
+    utarray_new(arr, &ut_int_icd);
+    token_positions_list *cur_next = 0;
+    for (cur = cursors, cur_next = cur->current, i = 0; i < n_tokens; cur++, i++)
+    {
+      while (cur_next)
+      {
+
+        utarray_sort(arr, intsort);
+        int *p1 = NULL;
+        p1 = utarray_find(arr, &cur_next->document_id, intsort);
+        if (p1 == NULL)
+        {
+          utarray_push_back(arr, &cur_next->document_id);
+        }
+        cur_next = cur_next->next;
+      }
+    }
+
+    int *p;
+    for (p = (int *)utarray_front(arr); p != NULL; p = (int *)utarray_next(arr, p))
+    {
+      // printf("line %d  the value of postions %d\n", __LINE__, *p);
+
+      int phrase_count = -1;
+      if (phrase_count)
+      {
+        double score = calc_tf_idf(tokens, cursors, n_tokens, env->indexed_count);
+        add_search_result(env, results, *p, score);
+      }
+    }
+    utarray_free(arr);
+
+  exit:
+    for (i = 0; i < n_tokens; i++)
+    {
+      if (cursors[i].documents)
+      {
+        free_token_positions_list(cursors[i].documents);
+      }
+    }
+    free(cursors);
+  }
+  free_inverted_index(tokens);
   if (SORT == "tf-idf")
   {
     HASH_SORT(*results, search_results_score_desc_sort);
@@ -391,6 +514,7 @@ int split_query_to_tokens(wiser_env *env,
                           const unsigned int text_len,
                           const int n, query_token_hash **query_tokens)
 {
+
   return text_to_postings_lists(env,
                                 0, /* 将document_id设为0 */
                                 text, text_len, n,
@@ -421,11 +545,11 @@ void print_search_results(wiser_env *env, search_results *results)
     r = results;
     HASH_DEL(results, r);
     db_get_document_title1(env, r->document_id, &title, &title_len);
-    char* myFormat = "%Y-%m-%d:%H:%M:%S";  //自定义格式
-    char myStr[255]="\0";  //strftime 第一个参数是 char *
-    strftime(myStr,255,myFormat,&r->stamp);
+    char *myFormat = "%Y-%m-%d:%H:%M:%S"; //自定义格式
+    char myStr[255] = "\0";               //strftime 第一个参数是 char *
+    strftime(myStr, 255, myFormat, &r->stamp);
     printf("document_id: %d title: %.*s score: %lf  body-size: %d  create time: %s\n\n",
-           r->document_id, title_len, title, r->score,r->body_size,myStr );
+           r->document_id, title_len, title, r->score, r->body_size, myStr);
     free(r);
   }
 
@@ -453,14 +577,15 @@ void search(wiser_env *env, const char *query)
       char **p;
       UT_array *partial_tokens;
 
-      utarray_new(partial_tokens,&ut_str_icd);
-      token_partial_match(env,query,strlen(query),partial_tokens);
-      
-      for(p=(char**)utarray_front(partial_tokens);p;p=(char**)utarray_next(partial_tokens,p)){
-        inverted_index_hash *query_postings=NULL;
-        token_to_postings_list(env,0,*p,strlen(*p),0,&query_postings);
+      utarray_new(partial_tokens, &ut_str_icd);
+      token_partial_match1(env, query, strlen(query), partial_tokens);
 
-        search_docs(env,&results,query_postings);
+      for (p = (char **)utarray_front(partial_tokens); p; p = (char **)utarray_next(partial_tokens, p))
+      {
+        inverted_index_hash *query_postings = NULL;
+        token_to_postings_list(env, 0, *p, strlen(*p), 0, &query_postings);
+
+        search_docs_and(env, &results, query_postings);
       }
 
       utarray_free(partial_tokens);
@@ -469,12 +594,26 @@ void search(wiser_env *env, const char *query)
     {
       query_token_hash *query_tokens = NULL;
       split_query_to_tokens(env, query32, query32_len, env->token_len, &query_tokens);
-
       int begintime, endtime;
-      begintime = clock(); //计时开始
-      search_docs(env, &results, query_tokens);
-      endtime = clock();
-      printf("\n\nsearch Time：%lf ms\n", (double)1000 * (endtime - begintime) / CLOCKS_PER_SEC);
+     
+      if (env->enable_or_query)
+      {
+        begintime = clock(); //计时开始
+
+        search_docs_or(env, &results, query_tokens);
+        endtime = clock();
+        printf("\n\nsearch Time：%lf ms\n", (double)1000 * (endtime - begintime) / CLOCKS_PER_SEC);
+      }
+      else
+      {
+
+        begintime = clock(); //计时开始
+
+        search_docs_and(env, &results, query_tokens);
+        endtime = clock();
+        printf("\n\nsearch Time：%lf ms\n", (double)1000 * (endtime - begintime) / CLOCKS_PER_SEC);
+      }
+      
     }
 
     print_search_results(env, results);

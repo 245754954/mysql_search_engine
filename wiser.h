@@ -4,7 +4,6 @@
 #include "include/utlist.h"
 #include "include/uthash.h"
 #include "include/utarray.h"
-#include <sqlite3.h>
 #include <mysql/mysql.h>
 #include <openssl/md5.h>
 
@@ -40,7 +39,7 @@ typedef enum
 /* 应用程序的全局配置 */
 typedef struct _wiser_env
 {
-  const char *db_path; /* 数据库的路径*/
+
 
   int token_len;            /* 词元的长度。N-gram中N的取值 */
   compress_method compress; /* 压缩倒排列表等数据的方法 */
@@ -50,35 +49,14 @@ typedef struct _wiser_env
   int ii_buffer_count;            /* 用于更新倒排索引的缓冲区中的文档数 */
   int ii_buffer_update_threshold; /* 缓冲区中文档数的阈值 */
   int indexed_count;              /* 建立了索引的文档数 */
+  int enable_or_query;
 
-  /* 与sqlite3相关的配置 */
-  sqlite3 *db; /* sqlite3的实例 */
-  /* sqlite3的准备语句 */
-  sqlite3_stmt *get_document_id_st;
-  sqlite3_stmt *get_document_title_st;
-  sqlite3_stmt *insert_document_st;
-  sqlite3_stmt *update_document_st;
-  sqlite3_stmt *get_token_id_st;
-  sqlite3_stmt *get_token_st;
-  sqlite3_stmt *store_token_st;
-  sqlite3_stmt *get_postings_st;
-  sqlite3_stmt *update_postings_st;
-  sqlite3_stmt *get_settings_st;
-  sqlite3_stmt *replace_settings_st;
-  sqlite3_stmt *get_document_count_st;
-  sqlite3_stmt *begin_st;
-  sqlite3_stmt *commit_st;
-  sqlite3_stmt *rollback_st;
+
+
 
   MYSQL *conn;
 
   MD5_CTX ctx;
-
-  char *server;
-  char *user;
-  char *password; /* 此处改成你的密码 */
-  char *database;
-
   /* sqlite3的准备语句 */
   MYSQL_STMT *get_document_id_st1;
   MYSQL_STMT *get_document_title_st1;
@@ -139,7 +117,7 @@ typedef struct _wiser_env
 
  void parse_compress_method(wiser_env *env, const char *method,int method_size);
  void fin_env(wiser_env *env);
- int init_env(wiser_env *env,int ii_buffer_update_threshold, int enable_phrase_search,const char *db_path);
+ int init_env(wiser_env *env,int ii_buffer_update_threshold, int enable_phrase_search,int enable_or_query,const char *db_path);
 
  void add_document(wiser_env *env, const char *title, const char *body, const char *timestamp);
 
