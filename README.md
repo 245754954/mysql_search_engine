@@ -18,13 +18,21 @@ My email address is:zhangfucheng18@nudt.edu.cn
 
 Installation Prerequisites
     (1) Install project dependency Libraries (ubuntu16)
-        apt-get install build-essential libmysqlclient-dev libexpat1-dev bzip2  openssl libssl-dev
+
+        apt-get install build-essential mysql-server mysql-client libmysqlclient-dev libexpat1-dev bzip2  openssl libssl-dev libevent-dev 
+
     (2)compile
+
         mkdir build
+
         cd ./build
+
         cmake ..
+
         make
+
     (3) run
+
         ./indexengine [options] [database or none]
         "options:\n"
         "  -c compress_method            : compress method for postings list\n"
