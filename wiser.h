@@ -93,7 +93,7 @@ typedef struct _wiser_env
 
 #define DEFAULT_II_BUFFER_UPDATE_THRESHOLD 150
 
-#define BUFFER_SIZE_DOC_CONTENT 4096
+#define BUFFER_SIZE_DOC_CONTENT 8192
 
 #define DBHOST "127.0.0.1"
 #define DBUSER "root"
