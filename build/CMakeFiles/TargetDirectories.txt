@@ -1,0 +1,5 @@
+/home/zfc/code/mysql_search_engine/build/CMakeFiles/edit_cache.dir
+/home/zfc/code/mysql_search_engine/build/CMakeFiles/indexengine.dir
+/home/zfc/code/mysql_search_engine/build/CMakeFiles/searchengine.dir
+/home/zfc/code/mysql_search_engine/build/CMakeFiles/encrypttool.dir
+/home/zfc/code/mysql_search_engine/build/CMakeFiles/rebuild_cache.dir

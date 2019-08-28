@@ -1,0 +1,26 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/zfc/code/mysql_search_engine/aesencrypt.c
+openssl/aes.h
+-
+stdio.h
+-
+string.h
+-
+assert.h
+-
+stdlib.h
+-
+aesencrypt.h
+/home/zfc/code/mysql_search_engine/aesencrypt.h
+unistd.h
+-
+
+/home/zfc/code/mysql_search_engine/aesencrypt.h
+
