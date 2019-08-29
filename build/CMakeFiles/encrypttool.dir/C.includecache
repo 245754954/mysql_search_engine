@@ -1,0 +1,26 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/ftpuser/wiser/wiser/wiser/origin-wiser/wiser/trunk/aesencrypt.c
+openssl/aes.h
+-
+stdio.h
+-
+string.h
+-
+assert.h
+-
+stdlib.h
+-
+aesencrypt.h
+/home/ftpuser/wiser/wiser/wiser/origin-wiser/wiser/trunk/aesencrypt.h
+unistd.h
+-
+
+/home/ftpuser/wiser/wiser/wiser/origin-wiser/wiser/trunk/aesencrypt.h
+

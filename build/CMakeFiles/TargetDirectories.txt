@@ -1,0 +1,5 @@
+/home/ftpuser/wiser/wiser/wiser/origin-wiser/wiser/trunk/build/CMakeFiles/rebuild_cache.dir
+/home/ftpuser/wiser/wiser/wiser/origin-wiser/wiser/trunk/build/CMakeFiles/edit_cache.dir
+/home/ftpuser/wiser/wiser/wiser/origin-wiser/wiser/trunk/build/CMakeFiles/indexengine.dir
+/home/ftpuser/wiser/wiser/wiser/origin-wiser/wiser/trunk/build/CMakeFiles/encrypttool.dir
+/home/ftpuser/wiser/wiser/wiser/origin-wiser/wiser/trunk/build/CMakeFiles/searchengine.dir

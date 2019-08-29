@@ -106,9 +106,9 @@ typedef struct _wiser_env
 #define DATABASE "invertindex1"
 
 //sort order way
-//#define SORT "tf-idf"
+#define SORT "tf-idf"
 //#define SORT "size"
-#define SORT "time-sort"
+//#define SORT "time-sort"
 
 
 

@@ -518,7 +518,7 @@ int db_add_document1(const wiser_env *env,
                      const char *title, unsigned int title_size,
                      const char *body, unsigned int body_size, const char *timestamp, int timestamp_size)
 {
-    printf("the time stamp is %s\n", timestamp);
+    //printf("the time stamp is %s\n", timestamp);
 
     int rc, document_id;
 
