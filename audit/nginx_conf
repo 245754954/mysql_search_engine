@@ -73,7 +73,7 @@ http {
         server 127.0.0.1:8120 weight=1;
 
 
-		ip_hash;
+	
    	}
 
 	server {
@@ -86,7 +86,7 @@ http {
 
 	       location / {
 			#以下是一些反向代理的配置可删除.
-            proxy_redirect off;
+            
 		   	proxy_pass http://zp_server1;
 	       }
 	}
@@ -140,8 +140,8 @@ http {
 	# Virtual Host Configs
 	##
 
-	include /etc/nginx/conf.d/*.conf;
-	include /etc/nginx/sites-enabled/*;
+	#include /etc/nginx/conf.d/*.conf;
+	#include /etc/nginx/sites-enabled/*;
 }
 
 
