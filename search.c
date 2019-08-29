@@ -115,8 +115,18 @@ add_search_result(wiser_env *env, search_results **results, const int document_i
     {
       r->document_id = document_id;
       r->score = 0;
-      db_get_document_size1(env, document_id, &r->body_size);
-      db_get_document_visit_time(env, document_id, &r->stamp);
+      if (SORT == "tf-idf")
+      {
+      }
+      else if (SORT == "size")
+      {
+        db_get_document_size1(env, document_id, &r->body_size);
+      }
+      else if (SORT == "time-sort")
+      {
+        db_get_document_visit_time(env, document_id, &r->stamp);
+      }
+
       HASH_ADD_INT(*results, document_id, r);
     }
   }
@@ -545,11 +555,29 @@ void print_search_results(wiser_env *env, search_results *results)
     r = results;
     HASH_DEL(results, r);
     db_get_document_title1(env, r->document_id, &title, &title_len);
-    char *myFormat = "%Y-%m-%d:%H:%M:%S"; //自定义格式
-    char myStr[255] = "\0";               //strftime 第一个参数是 char *
-    strftime(myStr, 255, myFormat, &r->stamp);
-    printf("document_id: %d title: %.*s score: %lf  body-size: %d  create time: %s\n\n",
-           r->document_id, title_len, title, r->score, r->body_size, myStr);
+    char myStr[255] = "\0"; 
+    if (SORT == "time-sort")
+    {
+      char *myFormat = "%Y-%m-%d:%H:%M:%S"; //自定义格式
+      //strftime 第一个参数是 char *
+      strftime(myStr, 255, myFormat, &r->stamp);
+    }
+
+    if (SORT == "tf-idf")
+    {
+
+      printf("document_id: %d title: %.*s score: %lf\n",
+             r->document_id, title_len, title, r->score);
+    }else if(SORT=="size")
+    {
+      printf("document_id: %d title: %.*s score: %lf  body-size: %d d\n",
+             r->document_id, title_len, title, r->score, r->body_size);
+    
+    }else if(SORT=="time-sort"){
+      printf("document_id: %d title: %.*s score: %lf  visit-time: %s \n",
+             r->document_id, title_len, title, r->score, myStr);   
+    }
+
     free(r);
   }
 
@@ -595,7 +623,7 @@ void search(wiser_env *env, const char *query)
       query_token_hash *query_tokens = NULL;
       split_query_to_tokens(env, query32, query32_len, env->token_len, &query_tokens);
       int begintime, endtime;
-     
+
       if (env->enable_or_query)
       {
         begintime = clock(); //计时开始
@@ -613,7 +641,6 @@ void search(wiser_env *env, const char *query)
         endtime = clock();
         printf("\n\nsearch Time：%lf ms\n", (double)1000 * (endtime - begintime) / CLOCKS_PER_SEC);
       }
-      
     }
 
     print_search_results(env, results);
