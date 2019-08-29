@@ -112,7 +112,7 @@ typedef struct _wiser_env
 
 
 
-#define K 3
+#define K 5
 
 
 

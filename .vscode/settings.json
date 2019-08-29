@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "search.h": "c",
+        "util.h": "c",
+        "mysqldatabase.h": "c"
+    }
+}

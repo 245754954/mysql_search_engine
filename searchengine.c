@@ -40,6 +40,7 @@
 #include <errno.h>
 #include "search.h"
 #include "wiser.h"
+#include "search.h"
 #include "mysqldatabase.h"
 #define DEFAULT_TIME 10        /*10s检测一次*/
 #define MIN_WAIT_TASK_NUM 10   /*如果queue_size > MIN_WAIT_TASK_NUM 添加新的线程到线程池*/
@@ -114,6 +115,8 @@ void find_http_header(struct evhttp_request *req, struct evkeyvalq *params, cons
 //处理模块
 void httpd_handler(struct evhttp_request *req, void *arg)
 {
+    char *result  = (char*)malloc(sizeof(char)*20480);
+    memset(result,0,sizeof(result));
     wiser_env *env = (wiser_env *)arg;
 
     char term[BUFFER_SIZE_DOC_CONTENT] = {'\0'};
@@ -123,12 +126,15 @@ void httpd_handler(struct evhttp_request *req, void *arg)
                                                        // printf("the term is %s\n",term);
     if (term == NULL || !strcmp("", term)||!strcmp(" ",term))
     {
-        printf("====line:%d,%s\n", __LINE__, "request uri no param term.\n");
+        //printf("====line:%d,%s\n", __LINE__, "request uri no param term.\n");
     }
     else
     {
         // printf("====line:%d,get request param: term=[%s]\n", __LINE__, term);
-        search(env, term);
+       
+        search_for_browser(env, term,&result);
+
+
     }
 
     /*
@@ -151,8 +157,10 @@ void httpd_handler(struct evhttp_request *req, void *arg)
         return;
     }
 
-    evbuffer_add_printf(buf, "Receive get request,Thamks for the request! the received trem is \n%s\n", term);
+    //evbuffer_add_printf(buf, "Receive get request,Thamks for the request! the received trem is \n%s\n", term);
+    evbuffer_add_printf(buf, "%s\n", result);
     evhttp_send_reply(req, HTTP_OK, "OK", buf);
+    free(result);
     evbuffer_free(buf);
 }
 
