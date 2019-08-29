@@ -551,7 +551,7 @@ void print_search_results(wiser_env *env, search_results *results)
     r = results;
     HASH_DEL(results, r);
     count++;
-    if (count < K)
+    if (count < env->K)
     {
 
       db_get_document_title1(env, r->document_id, &title, &title_len);
@@ -609,7 +609,7 @@ void print_search_results_for_browser(wiser_env *env, search_results *results,ch
     r = results;
     HASH_DEL(results, r);
     count++;
-    if (count < K)
+    if (count < env->K)
     {
 
       db_get_document_title1(env, r->document_id, &title, &title_len);
@@ -640,7 +640,8 @@ void print_search_results_for_browser(wiser_env *env, search_results *results,ch
     }
     free(r);
   }
-
+  sprintf(*result,"Total %u documents are found!\n", num_search_results);
+     
   //printf("Total %u documents are found!\n", num_search_results);
 }
 

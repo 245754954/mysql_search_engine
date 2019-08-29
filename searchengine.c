@@ -216,7 +216,8 @@ int main(int argc, char *argv[])
     //获取参数
     int c;
     extern char *optarg;
-    while ((c = getopt(argc, argv, "l:p:dt:h:o")) != -1)
+    int num;
+    while ((c = getopt(argc, argv, "l:p:dt:h:o:k")) != -1)
     {
         switch (c)
         {
@@ -235,7 +236,9 @@ int main(int argc, char *argv[])
         case 'a':
             enable_or_query = TRUE;
             break;
-        case 'h':
+        case 'k':
+            num=atoi(optarg);
+            break;
         default:
             show_help();
             exit(EXIT_SUCCESS);
@@ -262,6 +265,7 @@ int main(int argc, char *argv[])
 
 
     int rc = init_env(&env, ii_buffer_update_threshold, enable_phrase_search,enable_or_query, DATABASE);
+    env.K = num;
     int cm_size;
     char *cm;
     db_get_settings1(&env, "compress_method", sizeof("compress_method") - 1, &cm, &cm_size);

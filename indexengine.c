@@ -18,6 +18,7 @@ int main(int argc, char *argv[])
 
   wiser_env env;
   extern int optind;
+  int num=5;
   int enable_or_query = 0;
   int max_index_count = -1;
   int ii_buffer_update_threshold = DEFAULT_II_BUFFER_UPDATE_THRESHOLD;
@@ -29,7 +30,7 @@ int main(int argc, char *argv[])
     extern int opterr;
     extern char *optarg;
 
-    while ((ch = getopt(argc, argv, "c:x:q:m:t:s:a")) != -1)
+    while ((ch = getopt(argc, argv, "c:x:q:m:t:s:a:k")) != -1)
     {
       switch (ch)
       {
@@ -54,6 +55,10 @@ int main(int argc, char *argv[])
       case 'a':
         enable_or_query=TRUE;
         break;
+      case  'k':
+        num = atoi(optarg);
+        break;
+
       }
     }
   }
@@ -79,7 +84,10 @@ int main(int argc, char *argv[])
   }
 
   {
+    
     int rc = init_env(&env, ii_buffer_update_threshold, enable_phrase_search,enable_or_query, argv[optind]);
+    env.K = num;
+    
     if (!rc)
     {
       print_time_diff();

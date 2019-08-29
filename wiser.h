@@ -51,7 +51,7 @@ typedef struct _wiser_env
   int indexed_count;              /* 建立了索引的文档数 */
   int enable_or_query;
 
-
+  int K;
 
 
   MYSQL *conn;
@@ -112,7 +112,7 @@ typedef struct _wiser_env
 
 
 
-#define K 5
+
 
 
 
