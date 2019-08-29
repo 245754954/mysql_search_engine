@@ -544,40 +544,49 @@ void print_search_results(wiser_env *env, search_results *results)
   {
     return;
   }
+
   num_search_results = HASH_COUNT(results);
+  int count = 0;
 
   while (results)
   {
+    
+
     int title_len;
     const char *title;
     search_results *r;
 
     r = results;
     HASH_DEL(results, r);
-    db_get_document_title1(env, r->document_id, &title, &title_len);
-    char myStr[255] = "\0"; 
-    if (SORT == "time-sort")
+    count++;
+    if (count < K)
     {
-      char *myFormat = "%Y-%m-%d:%H:%M:%S"; //自定义格式
-      //strftime 第一个参数是 char *
-      strftime(myStr, 255, myFormat, &r->stamp);
+
+      db_get_document_title1(env, r->document_id, &title, &title_len);
+      char myStr[255] = "\0";
+      if (SORT == "time-sort")
+      {
+        char *myFormat = "%Y-%m-%d:%H:%M:%S"; //自定义格式
+        //strftime 第一个参数是 char *
+        strftime(myStr, 255, myFormat, &r->stamp);
+      }
+
+      if (SORT == "tf-idf")
+      {
+
+        printf("document_id: %d title: %.*s score: %lf\n", r->document_id, title_len, title, r->score);
+      }
+      else if (SORT == "size")
+      {
+        printf("document_id: %d title: %.*s score: %lf  body-size: %d d\n",
+               r->document_id, title_len, title, r->score, r->body_size);
+      }
+      else if (SORT == "time-sort")
+      {
+        printf("document_id: %d title: %.*s score: %lf  visit-time: %s \n",
+               r->document_id, title_len, title, r->score, myStr);
+      }
     }
-
-    if (SORT == "tf-idf")
-    {
-
-      printf("document_id: %d title: %.*s score: %lf\n",
-             r->document_id, title_len, title, r->score);
-    }else if(SORT=="size")
-    {
-      printf("document_id: %d title: %.*s score: %lf  body-size: %d d\n",
-             r->document_id, title_len, title, r->score, r->body_size);
-    
-    }else if(SORT=="time-sort"){
-      printf("document_id: %d title: %.*s score: %lf  visit-time: %s \n",
-             r->document_id, title_len, title, r->score, myStr);   
-    }
-
     free(r);
   }
 
