@@ -28,7 +28,7 @@ http {
 	##
 
 	#设定实际的服务器列表 
-    	upstream zp_server1
+    upstream zp_server1
 	{
         server 127.0.0.1:8080 weight=1;
 		server 127.0.0.1:8081 weight=1;
@@ -79,14 +79,14 @@ http {
 	server {
 	       #listen       443 ssl;
 		listen		80;	
-	       server_name  localhost;
+	    server_name  localhost;
 
-	       ssl_certificate      nginx.crt;
-	       ssl_certificate_key  nginx.key;
+	      # ssl_certificate      nginx.crt;
+	      # ssl_certificate_key  nginx.key;
 
 	       location / {
 			#以下是一些反向代理的配置可删除.
-                	proxy_redirect off;
+            proxy_redirect off;
 		   	proxy_pass http://zp_server1;
 	       }
 	}
