@@ -41,5 +41,25 @@
 ../build/searchengine -l 127.0.0.1 -p 8118 -d
 ../build/searchengine -l 127.0.0.1 -p 8119 -d
 ../build/searchengine -l 127.0.0.1 -p 8120 -d
+../build/searchengine -l 127.0.0.1 -p 8121 -d
+../build/searchengine -l 127.0.0.1 -p 8122 -d
+../build/searchengine -l 127.0.0.1 -p 8123 -d
+../build/searchengine -l 127.0.0.1 -p 8124 -d
+../build/searchengine -l 127.0.0.1 -p 8125 -d
+../build/searchengine -l 127.0.0.1 -p 8126 -d
+../build/searchengine -l 127.0.0.1 -p 8127 -d
+../build/searchengine -l 127.0.0.1 -p 8128 -d
+../build/searchengine -l 127.0.0.1 -p 8129 -d
+../build/searchengine -l 127.0.0.1 -p 8130 -d
+../build/searchengine -l 127.0.0.1 -p 8140 -d
+../build/searchengine -l 127.0.0.1 -p 8131 -d
+../build/searchengine -l 127.0.0.1 -p 8132 -d
+../build/searchengine -l 127.0.0.1 -p 8133 -d
+../build/searchengine -l 127.0.0.1 -p 8134 -d
+../build/searchengine -l 127.0.0.1 -p 8135 -d
+../build/searchengine -l 127.0.0.1 -p 8136 -d
+../build/searchengine -l 127.0.0.1 -p 8137 -d
+../build/searchengine -l 127.0.0.1 -p 8138 -d
+../build/searchengine -l 127.0.0.1 -p 8139 -d
 
 
