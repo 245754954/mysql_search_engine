@@ -115,26 +115,24 @@ void find_http_header(struct evhttp_request *req, struct evkeyvalq *params, cons
 //处理模块
 void httpd_handler(struct evhttp_request *req, void *arg)
 {
-    char *result  = (char*)malloc(sizeof(char)*20480);
-    memset(result,0,sizeof(result));
+    char *result = (char *)malloc(sizeof(char) * 20480);
+    memset(result, 0, sizeof(result));
     wiser_env *env = (wiser_env *)arg;
 
     char term[BUFFER_SIZE_DOC_CONTENT] = {'\0'};
-    
+
     struct evkeyvalq sign_params = {0};
     find_http_header(req, &sign_params, "term", term); //获取get请求uri中的sign参数
                                                        // printf("the term is %s\n",term);
-    if (term == NULL || !strcmp("", term)||!strcmp(" ",term))
+    if (term == NULL || !strcmp("", term) || !strcmp(" ", term))
     {
         //printf("====line:%d,%s\n", __LINE__, "request uri no param term.\n");
     }
     else
     {
         // printf("====line:%d,get request param: term=[%s]\n", __LINE__, term);
-       
-        search_for_browser(env, term,&result);
 
-
+        search_for_browser(env, term, &result);
     }
 
     /*
@@ -197,27 +195,27 @@ int main(int argc, char *argv[])
     int max_index_count = -1;
     int ii_buffer_update_threshold = DEFAULT_II_BUFFER_UPDATE_THRESHOLD;
     int enable_phrase_search = TRUE;
-    const char *compress_method_str = NULL,*query = NULL;
-    int enable_or_query=0;
+    const char *compress_method_str = NULL, *query = NULL;
+    int enable_or_query = 0;
 
     //默认参数
     char *httpd_option_listen = "0.0.0.0";
     int httpd_option_port = 8080;
     int httpd_option_daemon = 0;
     int httpd_option_timeout = 120; //in seconds
-
+   
 
     //自定义信号处理函数
     signal(SIGHUP, signal_handler);
     signal(SIGTERM, signal_handler);
     signal(SIGINT, signal_handler);
     signal(SIGQUIT, signal_handler);
-    
+
     //获取参数
     int c;
     extern char *optarg;
-    int num;
-    while ((c = getopt(argc, argv, "l:p:dt:h:o:k")) != -1)
+
+    while ((c = getopt(argc, argv, "l:p:dt:h:o")) != -1)
     {
         switch (c)
         {
@@ -235,9 +233,6 @@ int main(int argc, char *argv[])
             break;
         case 'a':
             enable_or_query = TRUE;
-            break;
-        case 'k':
-            num=atoi(optarg);
             break;
         default:
             show_help();
@@ -262,20 +257,16 @@ int main(int argc, char *argv[])
         }
     }
 
-
-
-    int rc = init_env(&env, ii_buffer_update_threshold, enable_phrase_search,enable_or_query, DATABASE);
-    env.K = num;
+    int rc = init_env(&env, ii_buffer_update_threshold, enable_phrase_search, enable_or_query, DATABASE);
+   
     int cm_size;
     char *cm;
     db_get_settings1(&env, "compress_method", sizeof("compress_method") - 1, &cm, &cm_size);
     parse_compress_method(&env, cm, cm_size);
     env.indexed_count = db_get_document_count1(&env);
 
-
     //初始化event API
     event_init();
-
 
     //创建一个http server
     struct evhttp *httpd;
