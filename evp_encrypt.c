@@ -109,7 +109,8 @@ void file_encrypt_decrypt(cipher_params_t *params, FILE *ifp, FILE *ofp){
     finish = clock();  
     duration = (double)(finish - start) / CLOCKS_PER_SEC;  
     printf( "%f seconds\n", duration );  
-
+    printf("%s\n","Encryption done!");
+    printf("%s\n","Starting  decrypt!");
 
    
     fwrite(out_buf, sizeof(unsigned char), out_len, ofp);
@@ -213,8 +214,7 @@ int main(int argc, char *argv[]) {
     /* Encryption done, close the file descriptors */
     fclose(f_input);
     fclose(f_enc);
-    printf("%s\n","Encryption done!");
-    printf("%s\n","Starting  decrypt!");
+   
     /* Decrypt the file */
     /* Indicate that we want to decrypt */
     params->encrypt = 0;
