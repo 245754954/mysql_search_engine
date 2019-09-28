@@ -34,7 +34,7 @@ void cleanup(cipher_params_t *params, FILE *ifp, FILE *ofp, int rc)
     exit(rc);
 }
 
-void file_encrypt_decrypt(cipher_params_t *params, FILE *ifp, FILE *ofp, int flag)
+clock_t file_encrypt_decrypt(cipher_params_t *params, FILE *ifp, FILE *ofp, int flag)
 {
 
     /* Allow enough space in output buffer for additional block */
@@ -113,14 +113,15 @@ void file_encrypt_decrypt(cipher_params_t *params, FILE *ifp, FILE *ofp, int fla
     finish = clock();
     duration = (double)(finish - start) / CLOCKS_PER_SEC;
     
-
+   
     if (flag)
     {
         printf("encryption takes %f seconds\n", duration);
         printf("%s\n", "Encryption done!");
         printf("%s\n", "Starting  decrypt!");
     }
-
+    clock_t start1; 
+    start1 = clock();
     fwrite(out_buf, sizeof(unsigned char), out_len, ofp);
     if (ferror(ofp))
     {
@@ -131,6 +132,7 @@ void file_encrypt_decrypt(cipher_params_t *params, FILE *ifp, FILE *ofp, int fla
 
     //EVP_CIPHER_CTX_free() : Clears all information from a cipher context and frees up any allocated memory associate with it, including context itself
     EVP_CIPHER_CTX_cleanup(ctx);
+    return start1;
 }
 
 void str2hex(char *str, char *hex, int len)
@@ -249,9 +251,9 @@ int main(int argc, char *argv[])
     }
     clock_t start1, finish1;
     double duration1;
-    start1 = clock();
+   
     /* Decrypt the given file */
-    file_encrypt_decrypt(params, f_input, f_dec, 0);
+    start1 =file_encrypt_decrypt(params, f_input, f_dec, 0);
 
     /* Close the open file descriptors */
     fclose(f_input);
