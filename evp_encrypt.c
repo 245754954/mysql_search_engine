@@ -125,7 +125,7 @@ void file_encrypt_decrypt(cipher_params_t *params, FILE *ifp, FILE *ofp){
     //EVP_CIPHER_CTX_free() : Clears all information from a cipher context and frees up any allocated memory associate with it, including context itself
     EVP_CIPHER_CTX_cleanup(ctx);
      finish1 = clock();  
-    duration1 = (double)(finish - start) / CLOCKS_PER_SEC;  
+    duration1 = (double)(finish1 - start1) / CLOCKS_PER_SEC;  
     printf( "%f  fwrite seconds\n", duration1 );  
 
 }
