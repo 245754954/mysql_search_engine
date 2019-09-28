@@ -111,10 +111,7 @@ void file_encrypt_decrypt(cipher_params_t *params, FILE *ifp, FILE *ofp){
     printf( "%f seconds\n", duration );  
 
 
-    clock_t start1 ,finish1;
-    double  duration1;
-    start1 = clock();  
-
+   
     fwrite(out_buf, sizeof(unsigned char), out_len, ofp);
     if (ferror(ofp)) {
         fprintf(stderr, "ERROR: fwrite error: %s\n", strerror(errno));
@@ -124,9 +121,7 @@ void file_encrypt_decrypt(cipher_params_t *params, FILE *ifp, FILE *ofp){
 
     //EVP_CIPHER_CTX_free() : Clears all information from a cipher context and frees up any allocated memory associate with it, including context itself
     EVP_CIPHER_CTX_cleanup(ctx);
-     finish1 = clock();  
-    duration1 = (double)(finish1 - start1) / CLOCKS_PER_SEC;  
-    printf( "%f  fwrite seconds\n", duration1 );  
+    
 
 }
 
@@ -211,14 +206,15 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "ERROR: fopen error: %s\n", strerror(errno));
         return errno;
     }
-
+    printf("%s\n","Starting  encrypt!");
     /* Encrypt the given file */
     file_encrypt_decrypt(params, f_input, f_enc);
 
     /* Encryption done, close the file descriptors */
     fclose(f_input);
     fclose(f_enc);
-
+    printf("%s\n","Encryption done!");
+    printf("%s\n","Starting  decrypt!");
     /* Decrypt the file */
     /* Indicate that we want to decrypt */
     params->encrypt = 0;
@@ -230,7 +226,7 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "ERROR: fopen error: %s\n", strerror(errno));
         return errno;
     }
-
+   
     /* Open and truncate file to zero length or create decrypted file for writing */
     f_dec = fopen("decrypted_file", "wb");
     if (!f_dec) {
@@ -245,7 +241,7 @@ int main(int argc, char *argv[]) {
     /* Close the open file descriptors */
     fclose(f_input);
     fclose(f_dec);
-
+    printf("%s\n","Decryption done!");
     /* Free the memory allocated to our structure */
     free(params);
 
