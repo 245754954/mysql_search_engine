@@ -111,6 +111,10 @@ void file_encrypt_decrypt(cipher_params_t *params, FILE *ifp, FILE *ofp){
     printf( "%f seconds\n", duration );  
 
 
+    clock_t start1 ,finish1;
+    double  duration1;
+    start = clock();  
+
     fwrite(out_buf, sizeof(unsigned char), out_len, ofp);
     if (ferror(ofp)) {
         fprintf(stderr, "ERROR: fwrite error: %s\n", strerror(errno));
@@ -120,6 +124,10 @@ void file_encrypt_decrypt(cipher_params_t *params, FILE *ifp, FILE *ofp){
 
     //EVP_CIPHER_CTX_free() : Clears all information from a cipher context and frees up any allocated memory associate with it, including context itself
     EVP_CIPHER_CTX_cleanup(ctx);
+     finish1 = clock();  
+    duration1 = (double)(finish - start) / CLOCKS_PER_SEC;  
+    printf( "%f  fwrite seconds\n", duration1 );  
+
 }
 
 void str2hex(char *str, char *hex, int len) {
