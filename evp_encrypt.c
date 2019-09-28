@@ -17,7 +17,7 @@
 #define AES_BLOCK_SIZE 16
 
 #define BUFSIZE 1024
-
+clock_t start1; 
 typedef struct _cipher_params_t
 {
     unsigned char *key;
@@ -120,8 +120,11 @@ clock_t file_encrypt_decrypt(cipher_params_t *params, FILE *ifp, FILE *ofp, int 
         printf("%s\n", "Encryption done!");
         printf("%s\n", "Starting  decrypt!");
     }
-    clock_t start1; 
-    start1 = clock();
+    if(flag){
+       
+        start1 = clock();
+    }
+    
     fwrite(out_buf, sizeof(unsigned char), out_len, ofp);
     if (ferror(ofp))
     {
@@ -249,21 +252,21 @@ int main(int argc, char *argv[])
         fprintf(stderr, "ERROR: fopen error: %s\n", strerror(errno));
         return errno;
     }
-    clock_t start1, finish1;
+    clock_t  finish1;
     double duration1;
    
     /* Decrypt the given file */
-    start1 =file_encrypt_decrypt(params, f_input, f_dec, 0);
+    file_encrypt_decrypt(params, f_input, f_dec, 0);
 
     /* Close the open file descriptors */
     fclose(f_input);
     fclose(f_dec);
-    finish1 = clock();
-    duration1 = (double)(finish1 - start1) / CLOCKS_PER_SEC;
-     printf("decryption takes %f seconds\n", duration1);
-    printf("%s\n", "Decryption done!");
+    
     /* Free the memory allocated to our structure */
     free(params);
-
+    finish1 = clock();
+    duration1 = (double)(finish1 - start1) / CLOCKS_PER_SEC;
+    printf("decryption takes %f seconds\n", duration1);
+    printf("%s\n", "Decryption done!");
     return 0;
 }
