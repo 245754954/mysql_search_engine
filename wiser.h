@@ -51,7 +51,7 @@ typedef struct _wiser_env
   int indexed_count;              /* 建立了索引的文档数 */
   int enable_or_query;
 
-
+  int K;
 
 
   MYSQL *conn;
@@ -93,7 +93,7 @@ typedef struct _wiser_env
 
 #define DEFAULT_II_BUFFER_UPDATE_THRESHOLD 150
 
-#define BUFFER_SIZE_DOC_CONTENT 4096
+#define BUFFER_SIZE_DOC_CONTENT 8192
 
 #define DBHOST "127.0.0.1"
 #define DBUSER "root"
@@ -106,11 +106,13 @@ typedef struct _wiser_env
 #define DATABASE "invertindex1"
 
 //sort order way
-//#define SORT "tf-idf"
+#define SORT "tf-idf"
 //#define SORT "size"
-#define SORT "time-sort"
+//#define SORT "time-sort"
 
 
+
+#define K 4
 
 
 

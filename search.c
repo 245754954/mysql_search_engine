@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <sys/types.h>
-
+#include "search.h"
 #include "util.h"
 #include "token.h"
 #include "mysqldatabase.h"
@@ -27,14 +27,6 @@ typedef struct
   int *current;              /* 当前的位置信息 */
 } phrase_search_cursor;
 
-typedef struct
-{
-  int document_id; /* 检索出的文档编号 */
-  double score;
-  unsigned int body_size; /* 检索得分 */
-  struct tm stamp;
-  UT_hash_handle hh; /* 用于将该结构体转化为哈希表 */
-} search_results;
 
 /**
  * 根据document size比较两条检索结果
@@ -115,8 +107,18 @@ add_search_result(wiser_env *env, search_results **results, const int document_i
     {
       r->document_id = document_id;
       r->score = 0;
-      db_get_document_size1(env, document_id, &r->body_size);
-      db_get_document_visit_time(env, document_id, &r->stamp);
+      if (SORT == "tf-idf")
+      {
+      }
+      else if (SORT == "size")
+      {
+        db_get_document_size1(env, document_id, &r->body_size);
+      }
+      else if (SORT == "time-sort")
+      {
+        db_get_document_visit_time(env, document_id, &r->stamp);
+      }
+
       HASH_ADD_INT(*results, document_id, r);
     }
   }
@@ -534,26 +536,119 @@ void print_search_results(wiser_env *env, search_results *results)
   {
     return;
   }
+
   num_search_results = HASH_COUNT(results);
+  int count = 0;
 
   while (results)
   {
+    
+
     int title_len;
     const char *title;
     search_results *r;
 
     r = results;
     HASH_DEL(results, r);
-    db_get_document_title1(env, r->document_id, &title, &title_len);
-    char *myFormat = "%Y-%m-%d:%H:%M:%S"; //自定义格式
-    char myStr[255] = "\0";               //strftime 第一个参数是 char *
-    strftime(myStr, 255, myFormat, &r->stamp);
-    printf("document_id: %d title: %.*s score: %lf  body-size: %d  create time: %s\n\n",
-           r->document_id, title_len, title, r->score, r->body_size, myStr);
+    count++;
+    if (count < K)
+    {
+
+      db_get_document_title1(env, r->document_id, &title, &title_len);
+      char myStr[255] = "\0";
+      if (SORT == "time-sort")
+      {
+        char *myFormat = "%Y-%m-%d:%H:%M:%S"; //自定义格式
+        //strftime 第一个参数是 char *
+        strftime(myStr, 255, myFormat, &r->stamp);
+      }
+
+      if (SORT == "tf-idf")
+      {
+
+        printf("document_id: %d title: %.*s score: %lf\n", r->document_id, title_len, title, r->score);
+      }
+      else if (SORT == "size")
+      {
+        printf("document_id: %d title: %.*s score: %lf  body-size: %d d\n",
+               r->document_id, title_len, title, r->score, r->body_size);
+      }
+      else if (SORT == "time-sort")
+      {
+        printf("document_id: %d title: %.*s score: %lf  visit-time: %s \n",
+               r->document_id, title_len, title, r->score, myStr);
+      }
+    }
     free(r);
   }
 
   printf("Total %u documents are found!\n", num_search_results);
+}
+
+
+void print_search_results_for_browser(wiser_env *env, search_results *results,char **result)
+{
+  int num_search_results;
+
+  if (!results)
+  {
+    return;
+  }
+
+  num_search_results = HASH_COUNT(results);
+  int count = 0;
+
+  while (results)
+  {
+    
+
+    int title_len;
+    const char *title;
+    search_results *r;
+
+    r = results;
+    HASH_DEL(results, r);
+    count++;
+    if (count < K)
+    {
+      char tmp[4096]={'\0'};
+
+      db_get_document_title1(env, r->document_id, &title, &title_len);
+      char myStr[255] = "\0";
+      if (SORT == "time-sort")
+      {
+        char *myFormat = "%Y-%m-%d:%H:%M:%S"; //自定义格式
+        //strftime 第一个参数是 char *
+        strftime(myStr, 255, myFormat, &r->stamp);
+      }
+
+      if (SORT == "tf-idf")
+      {
+
+        // printf("document_id: %d title: %.*s score: %lf\n", r->document_id, title_len, title, r->score);
+      }
+      else if (SORT == "size")
+      {
+        // printf("document_id: %d title: %.*s score: %lf  body-size: %d d\n", r->document_id, title_len, title, r->score, r->body_size);
+      }
+      else if (SORT == "time-sort")
+      {
+        // printf("document_id: %d title: %.*s score: %lf  visit-time: %s \n",r->document_id, title_len, title, r->score, myStr);
+      }
+
+      sprintf(tmp,"document_id: %d ,title %s:  score %lf \n",r->document_id,title,r->score);
+      strcat(*result,tmp);
+      memset(tmp,0,sizeof(tmp));
+
+    }
+    free(r);
+  }
+  char tot[1024]={'\0'};
+  sprintf(tot,"Total %u documents are found!\n", num_search_results);
+  strcat(*result,tot);
+ 
+     
+  //printf("Total %u documents are found!\n", num_search_results);
 }
 
 /**
@@ -595,7 +690,7 @@ void search(wiser_env *env, const char *query)
       query_token_hash *query_tokens = NULL;
       split_query_to_tokens(env, query32, query32_len, env->token_len, &query_tokens);
       int begintime, endtime;
-     
+
       if (env->enable_or_query)
       {
         begintime = clock(); //计时开始
@@ -613,11 +708,71 @@ void search(wiser_env *env, const char *query)
         endtime = clock();
         printf("\n\nsearch Time：%lf ms\n", (double)1000 * (endtime - begintime) / CLOCKS_PER_SEC);
       }
-      
     }
 
     print_search_results(env, results);
 
     free(query32);
   }
+}
+
+void search_for_browser(wiser_env *env, const char *query,char **result){
+
+  int query32_len;
+  UTF32Char *query32;
+
+  if (!utf8toutf32(query, strlen(query), &query32, &query32_len))
+  {
+    search_results *results = NULL;
+
+    if (query32_len < env->token_len)
+    {
+      // print_error("too short query.");
+
+      char **p;
+      UT_array *partial_tokens;
+
+      utarray_new(partial_tokens, &ut_str_icd);
+      token_partial_match1(env, query, strlen(query), partial_tokens);
+
+      for (p = (char **)utarray_front(partial_tokens); p; p = (char **)utarray_next(partial_tokens, p))
+      {
+        inverted_index_hash *query_postings = NULL;
+        token_to_postings_list(env, 0, *p, strlen(*p), 0, &query_postings);
+
+        search_docs_and(env, &results, query_postings);
+      }
+
+      utarray_free(partial_tokens);
+    }
+    else
+    {
+      query_token_hash *query_tokens = NULL;
+      split_query_to_tokens(env, query32, query32_len, env->token_len, &query_tokens);
+      int begintime, endtime;
+
+      if (env->enable_or_query)
+      {
+        //begintime = clock(); //计时开始
+
+        search_docs_or(env, &results, query_tokens);
+        //endtime = clock();
+       // printf("\n\nsearch Time：%lf ms\n", (double)1000 * (endtime - begintime) / CLOCKS_PER_SEC);
+      }
+      else
+      {
+
+       // begintime = clock(); //计时开始
+
+        search_docs_and(env, &results, query_tokens);
+       // endtime = clock();
+        //printf("\n\nsearch Time：%lf ms\n", (double)1000 * (endtime - begintime) / CLOCKS_PER_SEC);
+      }
+    }
+
+    print_search_results_for_browser(env, results,result);
+
+    free(query32);
+  }
+
 }

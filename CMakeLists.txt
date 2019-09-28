@@ -25,11 +25,11 @@ endif(CMAKE_COMPILER_IS_GNUCXX)
 
 
 ADD_EXECUTABLE(indexengine ${INDEX_ENGINE})
-TARGET_LINK_LIBRARIES(indexengine PRIVATE  m cjson expat sqlite3 crypto mysqlclient )
+TARGET_LINK_LIBRARIES(indexengine PRIVATE  m  expat crypto mysqlclient )
 
 
 add_executable(searchengine  ${SEARCH_ENGINE})
-target_link_libraries (searchengine PRIVATE sqlite3 m cjson mysqlclient expat event crypto  )
+target_link_libraries (searchengine PRIVATE  m  mysqlclient expat event crypto  )
 
 
 
