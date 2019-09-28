@@ -116,7 +116,7 @@ void file_encrypt_decrypt(cipher_params_t *params, FILE *ifp, FILE *ofp, int fla
 
     if (flag)
     {
-        printf("%f seconds\n", duration);
+        printf("encryption takes %f seconds\n", duration);
         printf("%s\n", "Encryption done!");
         printf("%s\n", "Starting  decrypt!");
     }
@@ -258,6 +258,7 @@ int main(int argc, char *argv[])
     fclose(f_dec);
     finish1 = clock();
     duration1 = (double)(finish1 - start1) / CLOCKS_PER_SEC;
+     printf("decryption takes %f seconds\n", duration1);
     printf("%s\n", "Decryption done!");
     /* Free the memory allocated to our structure */
     free(params);
