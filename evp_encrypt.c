@@ -113,7 +113,7 @@ void file_encrypt_decrypt(cipher_params_t *params, FILE *ifp, FILE *ofp){
 
     clock_t start1 ,finish1;
     double  duration1;
-    start = clock();  
+    start1 = clock();  
 
     fwrite(out_buf, sizeof(unsigned char), out_len, ofp);
     if (ferror(ofp)) {
