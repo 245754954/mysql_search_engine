@@ -112,10 +112,11 @@ void file_encrypt_decrypt(cipher_params_t *params, FILE *ifp, FILE *ofp, int fla
     }
     finish = clock();
     duration = (double)(finish - start) / CLOCKS_PER_SEC;
-    printf("%f seconds\n", duration);
+    
 
     if (flag)
     {
+        printf("%f seconds\n", duration);
         printf("%s\n", "Encryption done!");
         printf("%s\n", "Starting  decrypt!");
     }
@@ -246,13 +247,17 @@ int main(int argc, char *argv[])
         fprintf(stderr, "ERROR: fopen error: %s\n", strerror(errno));
         return errno;
     }
-
+    clock_t start1, finish1;
+    double duration1;
+    start1 = clock();
     /* Decrypt the given file */
     file_encrypt_decrypt(params, f_input, f_dec, 0);
 
     /* Close the open file descriptors */
     fclose(f_input);
     fclose(f_dec);
+    finish1 = clock();
+    duration1 = (double)(finish1 - start1) / CLOCKS_PER_SEC;
     printf("%s\n", "Decryption done!");
     /* Free the memory allocated to our structure */
     free(params);
