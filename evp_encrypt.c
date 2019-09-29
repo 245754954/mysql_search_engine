@@ -34,7 +34,7 @@ void cleanup(cipher_params_t *params, FILE *ifp, FILE *ofp, int rc)
     exit(rc);
 }
 
-clock_t file_encrypt_decrypt(cipher_params_t *params, FILE *ifp, FILE *ofp, int flag)
+void file_encrypt_decrypt(cipher_params_t *params, FILE *ifp, FILE *ofp, int flag)
 {
 
     /* Allow enough space in output buffer for additional block */
@@ -135,33 +135,10 @@ clock_t file_encrypt_decrypt(cipher_params_t *params, FILE *ifp, FILE *ofp, int 
 
     //EVP_CIPHER_CTX_free() : Clears all information from a cipher context and frees up any allocated memory associate with it, including context itself
     EVP_CIPHER_CTX_cleanup(ctx);
-    return start1;
+   
 }
 
-void str2hex(char *str, char *hex, int len)
-{
-    int tt, ss;
-    unsigned char temp[4];
-    for (tt = 0, ss = 0; tt < len, ss < 2 * len; tt++, ss += 2)
-    {
-        temp[0] = '0';
-        temp[1] = 'x';
-        temp[2] = str[ss];
-        temp[3] = str[ss + 1];
 
-        hex[tt] = (int)strtol(temp, NULL, 0);
-    }
-}
-
-void printBytes(unsigned char *buf, size_t len)
-{
-    int i;
-    for (i = 0; i < len; i++)
-    {
-        printf("%02x", buf[i]);
-    }
-    printf("\n");
-}
 
 int main(int argc, char *argv[])
 {
