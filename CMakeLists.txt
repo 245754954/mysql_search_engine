@@ -15,6 +15,9 @@ SET(evp_tool evp_encrypt.c)
 
 SET(evp_tool_only evp_encrypt_only.c)
 
+
+SET(replace_tool byte_replace.c)
+
 #判断编译器类型,如果是gcc编译器,则在编译选项中加入c++11支持
 
 if(CMAKE_COMPILER_IS_GNUCXX)
@@ -45,3 +48,6 @@ target_link_libraries (evp_tool PRIVATE crypto  )
 
 add_executable(evp_tool_only  ${evp_tool_only})
 target_link_libraries (evp_tool_only PRIVATE crypto  )
+
+add_executable(replace_tool  ${replace_tool})
+target_link_libraries (replace_tool PRIVATE   )

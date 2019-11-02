@@ -3,6 +3,7 @@
         "search.h": "c",
         "util.h": "c",
         "mysqldatabase.h": "c",
-        "unistd.h": "c"
+        "unistd.h": "c",
+        "byte_replace.h": "c"
     }
 }

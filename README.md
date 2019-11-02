@@ -84,3 +84,4 @@ using the http-load tool to test the searchengine server,for example ,you can us
 
 
 
+./replace_tool -c i -p 0 -f /opt/csc/csc1.txt
